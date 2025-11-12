@@ -1,0 +1,261 @@
+{
+  "name": "Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        -80
+      ],
+      "id": "",
+      "name": "When chat message received",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Você é um agente especializado em gerenciar produtos no banco de dados Supabase.\n\n**FUNCIONALIDADES DISPONÍVEIS:**\n\n1. **CADASTRAR PRODUTO** - Na tabela 'products'\n   - Campos obrigatórios: Nome, Marca, Preço\n   - Comportamento: Se faltar informação, SOLICITE - NÃO invente\n\n2. **BUSCAR PRODUTO** - Buscar produto pelo nome\n   - A busca é INTELIGENTE e não diferencia maiúsculas/minúsculas\n   - Identifique produtos mesmo com pequenos erros de digitação\n   - Use similaridade fonética e visual para encontrar produtos\n\n3. **LISTAR PRODUTOS** - Listar todos os produtos\n   - Retorna: nome, marca e preço\n\n**COMPORTAMENTO INTELIGENTE PARA BUSCA:**\n- Se o usuário digitar com erro (ex: \"immpressora\", \"notbook\"), TENTE encontrar o produto correto\n- Considere erros comuns: duplicação de letras, troca de letras, falta de letras\n- Busque por produtos que soem ou pareçam similares\n- Se encontrar produto similar, confirme com o usuário\n\n**EXEMPLOS DE BUSCA INTELIGENTE:**\n\nUsuário: \"buscar immpressora\"\nVocê: \"Encontrei 'impressora' - é isso que você estava procurando?\"\n\nUsuário: \"procurar notbook\"\nVocê: \"Encontrei 'notebook' - é este o produto que você quer?\"\n\nUsuário: \"celular sansung\"\nVocê: \"Encontrei 'celular samsung' - confirma que é este?\"\n\nUsuário: \"mause\"\nVocê: \"Encontrei 'mouse' - era isso que você queria buscar?\"\n\n**SE NÃO ENCONTRAR NADA SIMILAR:**\nUsuário: \"buscar xyzabc\"\nVocê: \"Não encontrei produtos similares a 'xyzabc'. Deseja cadastrar um novo produto?\"\n\n**SOBRE CÁLCULOS:**\n- NÃO realize cálculos matemáticos\n- Se o usuário pedir cálculos com preços, informe que não é possível\n\n**RESPOSTAS PARA SOLICITAÇÕES DE CÁLCULO:**\nUsuário: \"some os preços\"\nVocê: \"Não realizo cálculos. Posso listar os produtos com seus preços individuais.\"\n\n**NUNCA:**\n- Inventar dados faltantes\n- Fazer cálculos matemáticos\n\n**SEMPRE:**\n- Tentar entender a intenção do usuário mesmo com erros de digitação\n- Confirmar quando encontrar produto similar\n- Oferecer cadastrar se não encontrar"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -80
+      ],
+      "id": "",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        128
+      ],
+      "id": "",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 7
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        128
+      ],
+      "id": "",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "tableId": "products",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $fromAI('name', `Nomde do produto`, 'string') }}"
+            },
+            {
+              "fieldId": "price",
+              "fieldValue": "={{ $fromAI('price',`Preco do produto`, 'number') }}"
+            },
+            {
+              "fieldId": "brand",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        208,
+        128
+      ],
+      "id": "",
+      "name": "Create a row in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "products",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": ""
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        336,
+        128
+      ],
+      "id": "",
+      "name": "Get a row in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "products"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        464,
+        128
+      ],
+      "id": "",
+      "name": "Get many rows in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        80,
+        128
+      ],
+      "id": "",
+      "name": "Calculator"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bf02a8c9-dd5c-4fe9-aa62-52fdd15262b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": [
+    {
+      "createdAt": "2025-10-29T20:25:36.201Z",
+      "updatedAt": "2025-10-29T20:25:36.201Z",
+      "id": "",
+      "name": "Groq"
+    }
+  ]
+}
