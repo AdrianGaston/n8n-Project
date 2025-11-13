@@ -19,6 +19,8 @@ Este projeto utiliza **n8n** para automatizar a interação com **Supabase**. El
 
 - Instalação do n8n (local ou em nuvem).
 - Conta no Supabase.
+- **Credenciais do Supabase**: Você precisará criar suas credenciais no Supabase para acessar o banco de dados.
+- **Credenciais do LLM**: Certifique-se de obter as credenciais necessárias para o modelo de linguagem que você está utilizando.
 
 ## 🚀 Como Usar
 
