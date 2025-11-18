@@ -26,5 +26,5 @@ Este projeto utiliza **n8n** para automatizar a interação com **Supabase**. El
 
 1. **Clone o Repositório**:
    ```bash
-   git clone <URL-do-repositório>
-   cd <nome-do-repositório>
+   git clone https://github.com/AdrianGaston/n8n-Project.git
+   cd n8n-Project
