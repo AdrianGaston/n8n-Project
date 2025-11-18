@@ -3,76 +3,42 @@
   "nodes": [
     {
       "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        -272,
-        -80
-      ],
-      "id": "",
-      "name": "When chat message received",
-      "webhookId": ""
-    },
-    {
-      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
         "options": {
-          "systemMessage": "=Você é um agente especializado em gerenciar produtos no banco de dados Supabase.\n\n**FUNCIONALIDADES DISPONÍVEIS:**\n\n1. **CADASTRAR PRODUTO** - Na tabela 'products'\n   - Campos obrigatórios: Nome, Marca, Preço\n   - Comportamento: Se faltar informação, SOLICITE - NÃO invente\n\n2. **BUSCAR PRODUTO** - Buscar produto pelo nome\n   - A busca é INTELIGENTE e não diferencia maiúsculas/minúsculas\n   - Identifique produtos mesmo com pequenos erros de digitação\n   - Use similaridade fonética e visual para encontrar produtos\n\n3. **LISTAR PRODUTOS** - Listar todos os produtos\n   - Retorna: nome, marca e preço\n\n**COMPORTAMENTO INTELIGENTE PARA BUSCA:**\n- Se o usuário digitar com erro (ex: \"immpressora\", \"notbook\"), TENTE encontrar o produto correto\n- Considere erros comuns: duplicação de letras, troca de letras, falta de letras\n- Busque por produtos que soem ou pareçam similares\n- Se encontrar produto similar, confirme com o usuário\n\n**EXEMPLOS DE BUSCA INTELIGENTE:**\n\nUsuário: \"buscar immpressora\"\nVocê: \"Encontrei 'impressora' - é isso que você estava procurando?\"\n\nUsuário: \"procurar notbook\"\nVocê: \"Encontrei 'notebook' - é este o produto que você quer?\"\n\nUsuário: \"celular sansung\"\nVocê: \"Encontrei 'celular samsung' - confirma que é este?\"\n\nUsuário: \"mause\"\nVocê: \"Encontrei 'mouse' - era isso que você queria buscar?\"\n\n**SE NÃO ENCONTRAR NADA SIMILAR:**\nUsuário: \"buscar xyzabc\"\nVocê: \"Não encontrei produtos similares a 'xyzabc'. Deseja cadastrar um novo produto?\"\n\n**SOBRE CÁLCULOS:**\n- NÃO realize cálculos matemáticos\n- Se o usuário pedir cálculos com preços, informe que não é possível\n\n**RESPOSTAS PARA SOLICITAÇÕES DE CÁLCULO:**\nUsuário: \"some os preços\"\nVocê: \"Não realizo cálculos. Posso listar os produtos com seus preços individuais.\"\n\n**NUNCA:**\n- Inventar dados faltantes\n- Fazer cálculos matemáticos\n\n**SEMPRE:**\n- Tentar entender a intenção do usuário mesmo com erros de digitação\n- Confirmar quando encontrar produto similar\n- Oferecer cadastrar se não encontrar"
+          "systemMessage": "=Você é um agente especializado em gerenciar produtos no banco de dados Supabase.\n\n**FERRAMENTAS DISPONÍVEIS:**\n\n1. **THINK** - Processar informações e planejar ações\n   - Use para analisar solicitações do usuário antes de executar\n   - Use para identificar qual ferramenta usar em cada situação\n\n2. **CREATE** - Cadastrar novo produto na tabela 'products'\n   - Campos obrigatórios: Nome, Marca, Preço\n   - Comportamento: Se faltar informação, SOLICITE - NÃO invente\n\n3. **GET MANY** - Listar todos os produtos\n   - Retorna: todos os produtos com nome, marca e preço\n\n4. **GET A ROW** - Buscar produto específico pelo NOME\n   - Use para buscar produtos pelo nome\n   - A busca é INTELIGENTE e não diferencia maiúsculas/minúsculas\n   - Identifique produtos mesmo com pequenos erros de digitação\n\n5. **UPDATE** - Atualizar dados de um produto existente\n   - Use para atualizar o PREÇO de um produto identificado pelo NOME\n   - Necessário: Identificar o produto pelo NOME e o novo preço\n\n6. **DELETE** - Deletar um produto da tabela\n   - Necessário: Identificar o produto exato pelo NOME a ser removido\n   - Comportamento: **SEMPE PEÇA CONFIRMAÇÃO** antes de deletar\n\n**COMPORTAMENTO PARA CONFIRMAÇÕES:**\n- **DELETE**: SEMPRE peça confirmação antes de excluir\n- **CREATE**: Proceda diretamente quando tiver todos os dados\n- **UPDATE**: Proceda diretamente quando tiver o produto e novo preço\n- **GET MANY/GET A ROW**: Proceda diretamente\n\n**EXEMPLOS DE FLUXO:**\n\nDELETE (com confirmação):\nUsuário: \"deletar impressora\"\nVocê: \"**Confirma que deseja deletar permanentemente o produto 'impressora'?**\"\n\nUsuário: \"excluir mouse\"\nVocê: \"**Tem certeza que quer remover o produto 'mouse'?**\"\n\nUPDATE (sem confirmação):\nUsuário: \"atualizar preço do notebook para 1500\"\nVocê: \"Vou atualizar o preço do notebook para R$ 1500.\"\n\nUsuário: \"mudar valor do celular para 2000\"\nVocê: \"Atualizando preço do celular para R$ 2000.\"\n\nCREATE (sem confirmação):\nUsuário: \"cadastrar produto: Notebook, Dell, 2500\"\nVocê: \"Produto 'Notebook' da marca 'Dell' com preço R$ 2500 será cadastrado.\"\n\n**BUSCA INTELIGENTE:**\nUsuário: \"buscar immpressora\"\nVocê: \"Encontrei 'impressora' - é isso que você estava procurando?\"\n\nUsuário: \"procurar notbook\"\nVocê: \"Encontrei 'notebook' - é este o produto?\"\n\n**NUNCA:**\n- Inventar dados faltantes\n- Fazer cálculos matemáticos\n- **Usar DELETE sem confirmação explícita**\n\n**SEMPRE:**\n- **Pedir confirmação APENAS para operações DELETE**\n- Proceder diretamente com CREATE, UPDATE, GET MANY e GET A ROW\n- Usar THINK para planejar ações quando necessário\n- Para CREATE, solicitar dados faltantes (nome, marca, preço)"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.1,
       "position": [
-        -64,
-        -80
+        144,
+        -192
       ],
       "id": "",
       "name": "AI Agent"
     },
     {
-      "parameters": {
-        "model": "openai/gpt-oss-120b",
-        "options": {
-          "temperature": 0.7
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
       "typeVersion": 1,
       "position": [
-        -192,
+        112,
         128
       ],
       "id": "",
-      "name": "Groq Chat Model",
-      "credentials": {
-        "groqApi": {
-          "id": "",
-          "name": "Groq account"
-        }
-      }
+      "name": "Calculator"
     },
     {
       "parameters": {
-        "contextWindowLength": 7
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-      "typeVersion": 1.3,
-      "position": [
-        -48,
-        128
-      ],
-      "id": "",
-      "name": "Simple Memory"
-    },
-    {
-      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Create a row in Supabase {{ $json.chatInput }}",
         "tableId": "products",
         "fieldsUi": {
           "fieldValues": [
             {
               "fieldId": "name",
-              "fieldValue": "={{ $fromAI('name', `Nomde do produto`, 'string') }}"
+              "fieldValue": "={{ $fromAI('name', `Nome do produto`, 'string') }}"
             },
             {
               "fieldId": "price",
@@ -80,7 +46,7 @@
             },
             {
               "fieldId": "brand",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+              "fieldValue": "={{ $fromAI('brand',`Marca do produto`, 'string') }}"
             }
           ]
         }
@@ -88,11 +54,32 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        208,
+        304,
         128
       ],
       "id": "",
-      "name": "Create a row in Supabase",
+      "name": "Create",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "products",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        400,
+        128
+      ],
+      "id": "",
+      "name": "Get many",
       "credentials": {
         "supabaseApi": {
           "id": "",
@@ -108,7 +95,7 @@
           "conditions": [
             {
               "keyName": "name",
-              "keyValue": ""
+              "keyValue": "={{ $fromAI('name', `Nomde do produto para busca`, 'string') }}"
             }
           ]
         }
@@ -116,11 +103,11 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        336,
+        496,
         128
       ],
       "id": "",
-      "name": "Get a row in Supabase",
+      "name": "Get a row",
       "credentials": {
         "supabaseApi": {
           "id": "",
@@ -130,17 +117,64 @@
     },
     {
       "parameters": {
-        "operation": "getAll",
-        "tableId": "products"
+        "operation": "update",
+        "tableId": "products",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('name', `Nomde do produto`, 'string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "price",
+              "fieldValue": "={{ $fromAI('price',`Preco do produto para atualizar`, 'number') }}"
+            }
+          ]
+        }
       },
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        464,
+        592,
         128
       ],
       "id": "",
-      "name": "Get many rows in Supabase",
+      "name": "Update",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "products",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('name', `Nome do produto para excluir`, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        688,
+        128
+      ],
+      "id": "",
+      "name": "Delete",
       "credentials": {
         "supabaseApi": {
           "id": "",
@@ -150,18 +184,153 @@
     },
     {
       "parameters": {},
-      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1,
       "position": [
-        80,
+        208,
         128
       ],
       "id": "",
-      "name": "Calculator"
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        128
+      ],
+      "id": "",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        -192
+      ],
+      "id": "",
+      "name": "When chat message received",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        128
+      ],
+      "id": "",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "",
+          "name": "Groq account"
+        }
+      }
     }
   ],
   "pinData": {},
   "connections": {
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "When chat message received": {
       "main": [
         [
@@ -183,68 +352,13 @@
           }
         ]
       ]
-    },
-    "Simple Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create a row in Supabase": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a row in Supabase": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many rows in Supabase": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Calculator": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "bf02a8c9-dd5c-4fe9-aa62-52fdd15262b9",
+  "versionId": "",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": ""
